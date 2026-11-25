@@ -6,6 +6,9 @@ import com.emergence.agent.Perception;
 import com.emergence.decision.Action;
 import com.emergence.decision.AgentStrategy;
 import com.emergence.game.GameTheoryEngine;
+import com.emergence.social.InformationDiffusion;
+import com.emergence.social.SocialLearningEngine;
+import com.emergence.social.SocialNetwork;
 import com.emergence.swarm.GroupManager;
 import com.emergence.swarm.NavigationEngine;
 import com.emergence.world.Cell;
@@ -35,6 +38,9 @@ public final class Simulation {
     private final GameTheoryEngine gameTheoryEngine;
     private final GroupManager groupManager;
     private final NavigationEngine navigationEngine;
+    private final SocialNetwork socialNetwork;
+    private final InformationDiffusion informationDiffusion;
+    private final SocialLearningEngine socialLearningEngine;
     private final List<SimulationModule> modules = new ArrayList<>();
 
     private SimulationContext context;
@@ -46,9 +52,16 @@ public final class Simulation {
         this.gameTheoryEngine = new GameTheoryEngine();
         this.groupManager = new GroupManager();
         this.navigationEngine = new NavigationEngine();
+        this.socialNetwork = new SocialNetwork();
+        this.gameTheoryEngine.setSocialNetwork(this.socialNetwork);
+        this.informationDiffusion = new InformationDiffusion(this.socialNetwork);
+        this.socialLearningEngine = new SocialLearningEngine(this.socialNetwork);
         this.modules.add(this.gameTheoryEngine);
         this.modules.add(this.groupManager);
         this.modules.add(this.navigationEngine);
+        this.modules.add(this.socialNetwork);
+        this.modules.add(this.informationDiffusion);
+        this.modules.add(this.socialLearningEngine);
         this.config.validate();
         initializeWorld();
     }
@@ -63,6 +76,18 @@ public final class Simulation {
 
     public NavigationEngine getNavigationEngine() {
         return navigationEngine;
+    }
+
+    public SocialNetwork getSocialNetwork() {
+        return socialNetwork;
+    }
+
+    public InformationDiffusion getInformationDiffusion() {
+        return informationDiffusion;
+    }
+
+    public SocialLearningEngine getSocialLearningEngine() {
+        return socialLearningEngine;
     }
 
     public void registerModule(SimulationModule module) {

@@ -21,6 +21,7 @@ public final class AgentMemory {
     private final Deque<Position> knownHazards = new ArrayDeque<>();
     private final Deque<String> recentEvents = new ArrayDeque<>();
     private final Deque<InteractionOutcome> interactionHistory = new ArrayDeque<>();
+    private int messagesReceived = 0;
 
     public AgentMemory() {
         this(DEFAULT_CAPACITY);
@@ -65,6 +66,14 @@ public final class AgentMemory {
 
     public List<InteractionOutcome> getAllInteractions() {
         return Collections.unmodifiableList(new ArrayList<>(interactionHistory));
+    }
+
+    public void incrementMessagesReceived() {
+        messagesReceived++;
+    }
+
+    public int getMessagesReceived() {
+        return messagesReceived;
     }
 
     public List<Position> getKnownResourceLocations() {

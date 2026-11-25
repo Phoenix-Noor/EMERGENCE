@@ -4,6 +4,7 @@ import com.emergence.agent.Agent;
 import com.emergence.core.SimulationContext;
 import com.emergence.core.SimulationEvent;
 import com.emergence.core.SimulationModule;
+import com.emergence.social.SocialNetwork;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,6 +25,7 @@ public final class GameTheoryEngine implements SimulationModule {
 
     private final PayoffMatrix payoffMatrix;
     private final RepeatedGame repeatedGame;
+    private SocialNetwork socialNetwork;
 
     private long totalInteractions;
     private long cooperationMoves;
@@ -38,6 +40,10 @@ public final class GameTheoryEngine implements SimulationModule {
     public GameTheoryEngine(PayoffMatrix payoffMatrix) {
         this.payoffMatrix = Objects.requireNonNull(payoffMatrix, "payoffMatrix must not be null");
         this.repeatedGame = new RepeatedGame(payoffMatrix);
+    }
+
+    public void setSocialNetwork(SocialNetwork socialNetwork) {
+        this.socialNetwork = socialNetwork;
     }
 
     @Override
@@ -89,6 +95,11 @@ public final class GameTheoryEngine implements SimulationModule {
 
             agentA.getMemory().recordInteraction(outA);
             partner.getMemory().recordInteraction(outB);
+
+            if (socialNetwork != null) {
+                socialNetwork.recordGameInteraction(agentA, partner, outB.selfMove(), tick);
+                socialNetwork.recordGameInteraction(partner, agentA, outA.selfMove(), tick);
+            }
 
             // Apply payoff to agent energy (payoffs above baseline reward cooperation; below baseline cost energy)
             agentA.adjustEnergy((outA.selfPayoff() - PAYOFF_BASELINE_NEUTRAL) * ENERGY_SCALE);

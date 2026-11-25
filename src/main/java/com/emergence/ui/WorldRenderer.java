@@ -2,6 +2,8 @@ package com.emergence.ui;
 
 import com.emergence.agent.Agent;
 import com.emergence.core.SimulationContext;
+import com.emergence.social.Relationship;
+import com.emergence.social.SocialNetwork;
 import com.emergence.swarm.AgentGroup;
 import com.emergence.swarm.GroupManager;
 import com.emergence.world.Cell;
@@ -33,6 +35,7 @@ public final class WorldRenderer {
     private boolean showTerrain = true;
     private boolean showResources = true;
     private boolean showGroups = true;
+    private boolean showSocial = true;
     private boolean showAgents = true;
 
     public void adjustZoom(double factor, double pivotX, double pivotY) {
@@ -57,6 +60,7 @@ public final class WorldRenderer {
     public void setShowTerrain(boolean showTerrain) { this.showTerrain = showTerrain; }
     public void setShowResources(boolean showResources) { this.showResources = showResources; }
     public void setShowGroups(boolean showGroups) { this.showGroups = showGroups; }
+    public void setShowSocial(boolean showSocial) { this.showSocial = showSocial; }
     public void setShowAgents(boolean showAgents) { this.showAgents = showAgents; }
 
     public Position screenToGrid(double screenX, double screenY, Canvas canvas, World world) {
@@ -72,7 +76,7 @@ public final class WorldRenderer {
         return null;
     }
 
-    public void render(Canvas canvas, SimulationContext context, GroupManager groupManager, Long selectedAgentId) {
+    public void render(Canvas canvas, SimulationContext context, GroupManager groupManager, SocialNetwork socialNetwork, Long selectedAgentId) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         double w = canvas.getWidth();
         double h = canvas.getHeight();
@@ -127,6 +131,31 @@ public final class WorldRenderer {
                 gc.setFill(groupColor);
                 double r = Math.max(2.0, cellSize * 0.35);
                 gc.fillOval(cx - r, cy - r, r * 2, r * 2);
+            }
+        }
+
+        if (showSocial && socialNetwork != null) {
+            java.util.Map<Long, Agent> byId = new java.util.HashMap<>();
+            for (Agent a : context.getAgents()) {
+                if (a.isAlive()) byId.put(a.getId(), a);
+            }
+            gc.setLineWidth(Math.max(0.7, cellSize * 0.1));
+            for (Agent src : byId.values()) {
+                double sx = (src.getPosition().x() + 0.5) * cellSize;
+                double sy = (src.getPosition().y() + 0.5) * cellSize;
+                for (Relationship rel : socialNetwork.getOutgoingRelationships(src.getId())) {
+                    Agent dst = byId.get(rel.getTargetId());
+                    if (dst == null) continue;
+                    double dx = (dst.getPosition().x() + 0.5) * cellSize;
+                    double dy = (dst.getPosition().y() + 0.5) * cellSize;
+                    Color edgeColor = rel.getTrust() >= 0.6
+                            ? Color.color(0.25, 0.85, 0.55, 0.35)
+                            : (rel.getTrust() <= 0.35
+                            ? Color.color(0.90, 0.30, 0.30, 0.35)
+                            : Color.color(0.85, 0.70, 0.25, 0.28));
+                    gc.setStroke(edgeColor);
+                    gc.strokeLine(sx, sy, dx, dy);
+                }
             }
         }
 

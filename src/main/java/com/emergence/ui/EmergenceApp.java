@@ -61,6 +61,7 @@ public class EmergenceApp extends Application {
     private Label birthsDeathsLabel;
     private Label gameMetricsLabel;
     private Label swarmMetricsLabel;
+    private Label socialMetricsLabel;
     private Label stateLabel;
     private Label inspectorLabel;
     private ListView<String> eventListView;
@@ -156,6 +157,7 @@ public class EmergenceApp extends Application {
         CheckBox terrainLayer = layerCheck("Terrain", true, v -> { renderer.setShowTerrain(v); refreshUI(); });
         CheckBox resourceLayer = layerCheck("Resources", true, v -> { renderer.setShowResources(v); refreshUI(); });
         CheckBox groupLayer = layerCheck("Groups", true, v -> { renderer.setShowGroups(v); refreshUI(); });
+        CheckBox socialLayer = layerCheck("Social", true, v -> { renderer.setShowSocial(v); refreshUI(); });
         CheckBox agentLayer = layerCheck("Agents", true, v -> { renderer.setShowAgents(v); refreshUI(); });
 
         HBox bar = new HBox(10,
@@ -165,7 +167,7 @@ public class EmergenceApp extends Application {
                 new Separator(),
                 seedTitle, seedField, applySeedBtn,
                 new Separator(),
-                terrainLayer, resourceLayer, groupLayer, agentLayer
+                terrainLayer, resourceLayer, groupLayer, socialLayer, agentLayer
         );
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.setPadding(new Insets(10, 14, 10, 14));
@@ -255,9 +257,10 @@ public class EmergenceApp extends Application {
         birthsDeathsLabel = styledLabel("Births: 0 | Deaths: 0");
         gameMetricsLabel = styledLabel("Coop: 0.0% | Avg Payoff: 0.00");
         swarmMetricsLabel = styledLabel("Groups: 0 | Avg Size: 0.0");
+        socialMetricsLabel = styledLabel("Edges: 0 | Trust: 0.50");
         stateLabel = styledLabel("State: IDLE");
 
-        HBox status = new HBox(20, stateLabel, tickLabel, popLabel, resourceLabel, birthsDeathsLabel, gameMetricsLabel, swarmMetricsLabel);
+        HBox status = new HBox(18, stateLabel, tickLabel, popLabel, resourceLabel, birthsDeathsLabel, gameMetricsLabel, swarmMetricsLabel, socialMetricsLabel);
         status.setPadding(new Insets(8, 14, 8, 14));
         status.setStyle("-fx-background-color: #161b22; -fx-border-color: #30363d; -fx-border-width: 1 0 0 0;");
         return status;
@@ -307,6 +310,9 @@ public class EmergenceApp extends Application {
             var gm = simulation.getGroupManager();
             swarmMetricsLabel.setText(String.format(Locale.US, "Groups: %d | Avg Size: %.1f",
                     gm.getGroupCount(), gm.getAverageGroupSize()));
+            var sn = simulation.getSocialNetwork();
+            socialMetricsLabel.setText(String.format(Locale.US, "Edges: %d | Trust: %.2f",
+                    sn.getTotalEdgeCount(), sn.getAverageTrust()));
 
             if (selectedAgentId != null) {
                 Agent selected = ctx.getAgents().stream()
@@ -319,9 +325,12 @@ public class EmergenceApp extends Application {
                     String decisionInfo = dr == null ? "None" : String.format(Locale.US,
                             "%s (U=%.2f)\nReason: %s",
                             dr.selectedAction(), dr.selectedUtility(), dr.reason());
+                    int connCount = sn.getOutgoingRelationships(selected.getId()).size();
+                    double rep = sn.getReputation(selected.getId());
                     inspectorLabel.setText(String.format(Locale.US,
                             "ID: #%d (Gen %d) | Group: %s\nPos: (%d, %d)\nState: %s\nStrategy: %s\nAction: %s\nAge: %d\nEnergy: %.1f / %.1f\nHealth: %.1f / %.1f\n"
                                     + "--- Traits ---\nAggression:  %.2f\nCooperation: %.2f\nSociability: %.2f\nExploration: %.2f\nRisk Tol.:   %.2f\nTrust Prop.: %.2f\n"
+                                    + "--- Social ---\nReputation: %.2f | Links: %d | Msgs: %d\n"
                                     + "--- Decision ---\n%s",
                             selected.getId(), selected.getGeneration(),
                             selected.getGroupId() > 0 ? "#" + selected.getGroupId() : "None",
@@ -332,6 +341,7 @@ public class EmergenceApp extends Application {
                             selected.getHealth(), selected.getMaxHealth(),
                             t.aggression(), t.cooperation(), t.sociability(),
                             t.exploration(), t.riskTolerance(), t.trustPropensity(),
+                            rep, connCount, selected.getMemory().getMessagesReceived(),
                             decisionInfo
                     ));
                 } else {
@@ -353,7 +363,7 @@ public class EmergenceApp extends Application {
 
     private void renderCanvas() {
         synchronized (simLock) {
-            renderer.render(worldCanvas, simulation.getContext(), simulation.getGroupManager(), selectedAgentId);
+            renderer.render(worldCanvas, simulation.getContext(), simulation.getGroupManager(), simulation.getSocialNetwork(), selectedAgentId);
         }
     }
 

@@ -65,7 +65,9 @@ public final class UtilityEvaluator {
             resources = foodScore * 0.9 + (hasVisibleFood ? 0.25 : 0.1 * agent.getTraits().exploration());
             long nearbyCount = perception.getNearbyAgents().size();
             social = (nearbyCount > 0 ? 0.35 : 0.1) * agent.getTraits().sociability();
-            risk = target.getTerrain() == Terrain.HAZARD ? 1.0 : 0.05 * target.getTerrain().getMovementCostMultiplier();
+            boolean isKnownHazard = target.getTerrain() == Terrain.HAZARD
+                    || agent.getMemory().getKnownHazards().contains(target.getPosition());
+            risk = isKnownHazard ? 1.0 : 0.05 * target.getTerrain().getMovementCostMultiplier();
             reason = target.getResourceAmount() > 0.5 ? "Moving toward food" : "Exploring passable terrain";
         } else {
             // RestAction or fallback

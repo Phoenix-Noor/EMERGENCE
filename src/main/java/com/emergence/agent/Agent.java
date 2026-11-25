@@ -31,6 +31,7 @@ public final class Agent {
     private long groupId = 0L;
     private int lastMoveDx = 0;
     private int lastMoveDy = 0;
+    private boolean signalActive = false;
 
     public Agent(
             long id,
@@ -105,6 +106,9 @@ public final class Agent {
         this.lastMoveDx = dx;
         this.lastMoveDy = dy;
     }
+
+    public boolean isSignalActive() { return signalActive; }
+    public void setSignalActive(boolean signalActive) { this.signalActive = signalActive; }
 
     public void setLastActionName(String lastActionName) {
         this.lastActionName = lastActionName != null ? lastActionName : "NONE";
