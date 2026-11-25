@@ -42,6 +42,10 @@ public final class SimulationConfig {
     // Simulation speed
     private int ticksPerSecond = 10;
 
+    // Game theory parameters
+    private boolean gameTheoryEnabled = true;
+    private int interactionRadius = 2;
+
     public SimulationConfig() {
     }
 
@@ -149,4 +153,10 @@ public final class SimulationConfig {
 
     public int getTicksPerSecond() { return ticksPerSecond; }
     public void setTicksPerSecond(int ticksPerSecond) { this.ticksPerSecond = ticksPerSecond; }
+
+    public boolean isGameTheoryEnabled() { return gameTheoryEnabled; }
+    public void setGameTheoryEnabled(boolean gameTheoryEnabled) { this.gameTheoryEnabled = gameTheoryEnabled; }
+
+    public int getInteractionRadius() { return interactionRadius; }
+    public void setInteractionRadius(int interactionRadius) { this.interactionRadius = interactionRadius; }
 }

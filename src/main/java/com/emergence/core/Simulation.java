@@ -5,6 +5,7 @@ import com.emergence.agent.AgentTraits;
 import com.emergence.agent.Perception;
 import com.emergence.decision.Action;
 import com.emergence.decision.AgentStrategy;
+import com.emergence.game.GameTheoryEngine;
 import com.emergence.world.Cell;
 import com.emergence.world.Position;
 import com.emergence.world.Terrain;
@@ -29,6 +30,7 @@ public final class Simulation {
 
     private final SimulationConfig config;
     private final AgentStrategy defaultStrategy;
+    private final GameTheoryEngine gameTheoryEngine;
     private final List<SimulationModule> modules = new ArrayList<>();
 
     private SimulationContext context;
@@ -37,8 +39,14 @@ public final class Simulation {
     public Simulation(SimulationConfig config, AgentStrategy defaultStrategy) {
         this.config = Objects.requireNonNull(config, "config must not be null");
         this.defaultStrategy = Objects.requireNonNull(defaultStrategy, "defaultStrategy must not be null");
+        this.gameTheoryEngine = new GameTheoryEngine();
+        this.modules.add(this.gameTheoryEngine);
         this.config.validate();
         initializeWorld();
+    }
+
+    public GameTheoryEngine getGameTheoryEngine() {
+        return gameTheoryEngine;
     }
 
     public void registerModule(SimulationModule module) {

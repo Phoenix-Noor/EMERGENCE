@@ -21,6 +21,10 @@ public final class MoveAction implements Action {
         this.targetPosition = Objects.requireNonNull(targetPosition, "targetPosition must not be null");
     }
 
+    public Position getTargetPosition() {
+        return targetPosition;
+    }
+
     @Override
     public String getName() {
         return "MOVE";

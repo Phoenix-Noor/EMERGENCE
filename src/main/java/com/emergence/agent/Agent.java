@@ -1,5 +1,7 @@
 package com.emergence.agent;
 
+import com.emergence.decision.DecisionRecord;
+import com.emergence.game.StrategyType;
 import com.emergence.world.Position;
 
 import java.util.Objects;
@@ -24,6 +26,8 @@ public final class Agent {
     private int reproductionCooldown;
     private AgentState state;
     private String lastActionName = "NONE";
+    private StrategyType strategyType = StrategyType.TIT_FOR_TAT;
+    private DecisionRecord lastDecision;
 
     public Agent(
             long id,
@@ -80,6 +84,14 @@ public final class Agent {
     public AgentState getState() { return state; }
     public boolean isAlive() { return state != AgentState.DEAD; }
     public String getLastActionName() { return lastActionName; }
+
+    public StrategyType getStrategyType() { return strategyType; }
+    public void setStrategyType(StrategyType strategyType) {
+        this.strategyType = Objects.requireNonNull(strategyType, "strategyType must not be null");
+    }
+
+    public DecisionRecord getLastDecision() { return lastDecision; }
+    public void setLastDecision(DecisionRecord lastDecision) { this.lastDecision = lastDecision; }
 
     public void setLastActionName(String lastActionName) {
         this.lastActionName = lastActionName != null ? lastActionName : "NONE";

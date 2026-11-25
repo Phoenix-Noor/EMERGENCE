@@ -6,7 +6,8 @@ import com.emergence.core.Simulation;
 import com.emergence.core.SimulationConfig;
 import com.emergence.core.SimulationEvent;
 import com.emergence.core.SimulationState;
-import com.emergence.decision.LivingWorldStrategy;
+import com.emergence.decision.DecisionEngine;
+import com.emergence.decision.DecisionRecord;
 import com.emergence.world.Position;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -58,6 +59,7 @@ public class EmergenceApp extends Application {
     private Label popLabel;
     private Label resourceLabel;
     private Label birthsDeathsLabel;
+    private Label gameMetricsLabel;
     private Label stateLabel;
     private Label inspectorLabel;
     private ListView<String> eventListView;
@@ -65,7 +67,7 @@ public class EmergenceApp extends Application {
     @Override
     public void start(Stage stage) {
         SimulationConfig config = new SimulationConfig();
-        simulation = new Simulation(config, new LivingWorldStrategy());
+        simulation = new Simulation(config, new DecisionEngine());
         renderer = new WorldRenderer();
         executor = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "emergence-sim-thread");
@@ -249,9 +251,10 @@ public class EmergenceApp extends Application {
         popLabel = styledLabel("Population: 0");
         resourceLabel = styledLabel("Resources: 0.0");
         birthsDeathsLabel = styledLabel("Births: 0 | Deaths: 0");
+        gameMetricsLabel = styledLabel("Coop: 0.0% | Avg Payoff: 0.00");
         stateLabel = styledLabel("State: IDLE");
 
-        HBox status = new HBox(24, stateLabel, tickLabel, popLabel, resourceLabel, birthsDeathsLabel);
+        HBox status = new HBox(24, stateLabel, tickLabel, popLabel, resourceLabel, birthsDeathsLabel, gameMetricsLabel);
         status.setPadding(new Insets(8, 14, 8, 14));
         status.setStyle("-fx-background-color: #161b22; -fx-border-color: #30363d; -fx-border-width: 1 0 0 0;");
         return status;
@@ -294,6 +297,10 @@ public class EmergenceApp extends Application {
             popLabel.setText("Population: " + ctx.getLivingPopulationCount());
             resourceLabel.setText(String.format(Locale.US, "Resources: %.1f", ctx.getWorld().getTotalResources()));
             birthsDeathsLabel.setText("Births: " + ctx.getTotalBirths() + " | Deaths: " + ctx.getTotalDeaths());
+            var gameEngine = simulation.getGameTheoryEngine();
+            gameMetricsLabel.setText(String.format(Locale.US, "Coop: %.1f%% | Avg Payoff: %.2f",
+                    gameEngine.getCooperationFrequency() * 100.0,
+                    gameEngine.getAveragePayoff()));
 
             if (selectedAgentId != null) {
                 Agent selected = ctx.getAgents().stream()
@@ -302,16 +309,23 @@ public class EmergenceApp extends Application {
                         .orElse(null);
                 if (selected != null) {
                     AgentTraits t = selected.getTraits();
+                    DecisionRecord dr = selected.getLastDecision();
+                    String decisionInfo = dr == null ? "None" : String.format(Locale.US,
+                            "%s (U=%.2f)\nReason: %s",
+                            dr.selectedAction(), dr.selectedUtility(), dr.reason());
                     inspectorLabel.setText(String.format(Locale.US,
-                            "ID: #%d (Gen %d)\nPos: (%d, %d)\nState: %s\nAction: %s\nAge: %d\nEnergy: %.1f / %.1f\nHealth: %.1f / %.1f\n"
-                                    + "--- Traits ---\nAggression:  %.2f\nCooperation: %.2f\nSociability: %.2f\nExploration: %.2f\nRisk Tol.:   %.2f\nTrust Prop.: %.2f",
+                            "ID: #%d (Gen %d)\nPos: (%d, %d)\nState: %s\nStrategy: %s\nAction: %s\nAge: %d\nEnergy: %.1f / %.1f\nHealth: %.1f / %.1f\n"
+                                    + "--- Traits ---\nAggression:  %.2f\nCooperation: %.2f\nSociability: %.2f\nExploration: %.2f\nRisk Tol.:   %.2f\nTrust Prop.: %.2f\n"
+                                    + "--- Decision ---\n%s",
                             selected.getId(), selected.getGeneration(),
                             selected.getPosition().x(), selected.getPosition().y(),
-                            selected.getState(), selected.getLastActionName(),
+                            selected.getState(), selected.getStrategyType().getDisplayName(),
+                            selected.getLastActionName(),
                             selected.getAge(), selected.getEnergy(), selected.getMaxEnergy(),
                             selected.getHealth(), selected.getMaxHealth(),
                             t.aggression(), t.cooperation(), t.sociability(),
-                            t.exploration(), t.riskTolerance(), t.trustPropensity()
+                            t.exploration(), t.riskTolerance(), t.trustPropensity(),
+                            decisionInfo
                     ));
                 } else {
                     inspectorLabel.setText("Selected agent #" + selectedAgentId + " is no longer active.");

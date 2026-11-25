@@ -1,5 +1,6 @@
 package com.emergence.agent;
 
+import com.emergence.game.InteractionOutcome;
 import com.emergence.world.Position;
 
 import java.util.ArrayDeque;
@@ -19,6 +20,7 @@ public final class AgentMemory {
     private final Deque<Position> knownResourceLocations = new ArrayDeque<>();
     private final Deque<Position> knownHazards = new ArrayDeque<>();
     private final Deque<String> recentEvents = new ArrayDeque<>();
+    private final Deque<InteractionOutcome> interactionHistory = new ArrayDeque<>();
 
     public AgentMemory() {
         this(DEFAULT_CAPACITY);
@@ -45,6 +47,24 @@ public final class AgentMemory {
 
     public void recordEvent(String summary) {
         addBounded(recentEvents, summary);
+    }
+
+    public void recordInteraction(InteractionOutcome outcome) {
+        addBounded(interactionHistory, outcome);
+    }
+
+    public List<InteractionOutcome> getInteractionsWith(long partnerId) {
+        List<InteractionOutcome> result = new ArrayList<>();
+        for (InteractionOutcome outcome : interactionHistory) {
+            if (outcome.partnerId() == partnerId) {
+                result.add(outcome);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    public List<InteractionOutcome> getAllInteractions() {
+        return Collections.unmodifiableList(new ArrayList<>(interactionHistory));
     }
 
     public List<Position> getKnownResourceLocations() {

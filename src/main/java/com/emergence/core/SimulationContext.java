@@ -2,6 +2,7 @@ package com.emergence.core;
 
 import com.emergence.agent.Agent;
 import com.emergence.agent.AgentTraits;
+import com.emergence.game.GameStrategies;
 import com.emergence.world.Position;
 import com.emergence.world.World;
 
@@ -81,6 +82,7 @@ public final class SimulationContext {
                 generation,
                 traits
         );
+        agent.setStrategyType(GameStrategies.assignFromTraits(traits, random));
         agents.add(agent);
         return agent;
     }
@@ -100,6 +102,7 @@ public final class SimulationContext {
                 generation,
                 traits
         );
+        offspring.setStrategyType(GameStrategies.assignFromTraits(traits, random));
         pendingOffspring.add(offspring);
         totalBirths++;
         return offspring;
