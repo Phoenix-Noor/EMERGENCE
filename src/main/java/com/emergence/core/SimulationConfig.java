@@ -46,6 +46,15 @@ public final class SimulationConfig {
     private boolean gameTheoryEnabled = true;
     private int interactionRadius = 2;
 
+    // Swarm intelligence parameters
+    private boolean swarmEnabled = true;
+    private boolean swarmResourceSharingEnabled = true;
+    private int separationRadius = 2;
+    private int groupFormationRadius = 6;
+    private double separationWeight = 1.4;
+    private double alignmentWeight = 1.0;
+    private double cohesionWeight = 1.1;
+
     public SimulationConfig() {
     }
 
@@ -159,4 +168,25 @@ public final class SimulationConfig {
 
     public int getInteractionRadius() { return interactionRadius; }
     public void setInteractionRadius(int interactionRadius) { this.interactionRadius = interactionRadius; }
+
+    public boolean isSwarmEnabled() { return swarmEnabled; }
+    public void setSwarmEnabled(boolean swarmEnabled) { this.swarmEnabled = swarmEnabled; }
+
+    public boolean isSwarmResourceSharingEnabled() { return swarmResourceSharingEnabled; }
+    public void setSwarmResourceSharingEnabled(boolean swarmResourceSharingEnabled) { this.swarmResourceSharingEnabled = swarmResourceSharingEnabled; }
+
+    public int getSeparationRadius() { return separationRadius; }
+    public void setSeparationRadius(int separationRadius) { this.separationRadius = separationRadius; }
+
+    public int getGroupFormationRadius() { return groupFormationRadius; }
+    public void setGroupFormationRadius(int groupFormationRadius) { this.groupFormationRadius = groupFormationRadius; }
+
+    public double getSeparationWeight() { return separationWeight; }
+    public void setSeparationWeight(double separationWeight) { this.separationWeight = separationWeight; }
+
+    public double getAlignmentWeight() { return alignmentWeight; }
+    public void setAlignmentWeight(double alignmentWeight) { this.alignmentWeight = alignmentWeight; }
+
+    public double getCohesionWeight() { return cohesionWeight; }
+    public void setCohesionWeight(double cohesionWeight) { this.cohesionWeight = cohesionWeight; }
 }

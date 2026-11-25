@@ -51,7 +51,10 @@ public final class MoveAction implements Action {
         Position normalized = world.normalizePosition(targetPosition);
         Cell targetCell = world.getCell(normalized);
         double cost = context.getConfig().getMovementEnergyCost() * targetCell.getTerrain().getMovementCostMultiplier();
+        int dx = Integer.compare(normalized.x(), agent.getPosition().x());
+        int dy = Integer.compare(normalized.y(), agent.getPosition().y());
         agent.setPosition(normalized);
+        agent.setLastMove(dx, dy);
         agent.adjustEnergy(-cost);
     }
 }

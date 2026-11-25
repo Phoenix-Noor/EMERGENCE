@@ -11,8 +11,8 @@
 - [x] **Phase 0 — Project Foundation**: Maven project, package structure, shared interfaces, JavaFX entry point, architecture docs, build & launch verification.
 - [x] **Phase 1 — Living World**: World grid, terrain, resources, regeneration, agents, movement, energy, health, consumption, reproduction, death, deterministic seed reproducibility, JavaFX world renderer + controls. Verified via `LivingWorldTest` and `Phase1UiVerificationTest` (6/6 passing).
 - [x] **Phase 2 — Decision and Game Theory**: Perception, utility evaluation (`UtilityEvaluator` + `DecisionEngine`), explainable `DecisionRecord`, Prisoner's Dilemma (`PayoffMatrix`), repeated interactions (`RepeatedGame` + `GameTheoryEngine`), 6 strategies (`AlwaysCooperate`, `AlwaysDefect`, `TitForTat`, `Random`, `ConditionalCooperation`, `ResourceMaximizer`), game-theory metrics, and UI inspector/status integration. Verified with 11/11 passing tests.
-- [ ] **Phase 3 — Swarm Intelligence** *(Next)*: Separation, alignment, cohesion, group formation/splitting/merging, collective navigation.
-- [ ] **Phase 4 — Social Dynamics**: Relationship graph, trust, information diffusion, social learning.
+- [x] **Phase 3 — Swarm Intelligence**: Separation, alignment, cohesion (`FlockingEngine`), leaderless dynamic group formation/merging/cleanup (`GroupManager` + `AgentGroup`), collective resource discovery & sharing (`NavigationEngine`), swarm metrics, and JavaFX group layer visualization. Verified with 15/15 passing tests.
+- [ ] **Phase 4 — Social Dynamics** *(Next)*: Relationship graph, trust, information diffusion, social learning.
 - [ ] **Phase 5 — Evolution**: Trait inheritance, mutation, reproductive selection, generation tracking.
 - [ ] **Phase 6 — Analytics and Experimentation**: Metrics collection, multi-run experiment runner, statistical summaries, SQLite persistence.
 - [ ] **Phase 7 — Final Application**: Complete scientific laboratory UI, inspector, analytics charts, experiment lab, configuration export/import.

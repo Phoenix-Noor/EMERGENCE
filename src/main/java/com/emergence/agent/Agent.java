@@ -28,6 +28,9 @@ public final class Agent {
     private String lastActionName = "NONE";
     private StrategyType strategyType = StrategyType.TIT_FOR_TAT;
     private DecisionRecord lastDecision;
+    private long groupId = 0L;
+    private int lastMoveDx = 0;
+    private int lastMoveDy = 0;
 
     public Agent(
             long id,
@@ -92,6 +95,16 @@ public final class Agent {
 
     public DecisionRecord getLastDecision() { return lastDecision; }
     public void setLastDecision(DecisionRecord lastDecision) { this.lastDecision = lastDecision; }
+
+    public long getGroupId() { return groupId; }
+    public void setGroupId(long groupId) { this.groupId = groupId; }
+
+    public int getLastMoveDx() { return lastMoveDx; }
+    public int getLastMoveDy() { return lastMoveDy; }
+    public void setLastMove(int dx, int dy) {
+        this.lastMoveDx = dx;
+        this.lastMoveDy = dy;
+    }
 
     public void setLastActionName(String lastActionName) {
         this.lastActionName = lastActionName != null ? lastActionName : "NONE";

@@ -5,6 +5,7 @@ import com.emergence.agent.AgentState;
 import com.emergence.agent.Perception;
 import com.emergence.core.DeterministicRandom;
 import com.emergence.core.SimulationContext;
+import com.emergence.swarm.FlockingEngine;
 import com.emergence.world.Cell;
 import com.emergence.world.Position;
 import com.emergence.world.Terrain;
@@ -26,6 +27,7 @@ public final class DecisionEngine implements AgentStrategy {
     };
 
     private final UtilityEvaluator evaluator;
+    private final FlockingEngine flockingEngine = new FlockingEngine();
 
     public DecisionEngine() {
         this(new UtilityEvaluator());
@@ -117,6 +119,37 @@ public final class DecisionEngine implements AgentStrategy {
             if (toFood.isValid(context)) {
                 valid.add(toFood);
             }
+        }
+
+        // Swarm flocking step (Separation + Alignment + Cohesion)
+        if (context.getConfig().isSwarmEnabled() && !perception.getNearbyAgents().isEmpty()) {
+            Position flockStep = flockingEngine.computeFlockingStep(agent, perception.getNearbyAgents(), context.getConfig());
+            if (flockStep != null && !flockStep.equals(agent.getPosition())) {
+                MoveAction flockMove = new MoveAction(agent, flockStep);
+                if (flockMove.isValid(context)) {
+                    valid.add(flockMove);
+                }
+            }
+        }
+
+        // Shared resource memory navigation step
+        if (context.getConfig().isSwarmEnabled() && context.getConfig().isSwarmResourceSharingEnabled()) {
+            agent.getMemory().getKnownResourceLocations().stream()
+                    .filter(pos -> context.getWorld().isInBounds(pos))
+                    .filter(pos -> context.getWorld().getCell(pos).getResourceAmount() > 0.5)
+                    .min((a, b) -> Integer.compare(
+                            agent.getPosition().manhattanDistanceTo(a),
+                            agent.getPosition().manhattanDistanceTo(b)))
+                    .ifPresent(sharedPos -> {
+                        if (!sharedPos.equals(agent.getPosition())) {
+                            int dx = Integer.compare(sharedPos.x(), agent.getPosition().x());
+                            int dy = Integer.compare(sharedPos.y(), agent.getPosition().y());
+                            MoveAction navMove = new MoveAction(agent, agent.getPosition().translate(dx, dy));
+                            if (navMove.isValid(context)) {
+                                valid.add(navMove);
+                            }
+                        }
+                    });
         }
 
         // Exploratory step

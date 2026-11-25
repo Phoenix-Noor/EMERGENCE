@@ -2,6 +2,8 @@ package com.emergence.ui;
 
 import com.emergence.agent.Agent;
 import com.emergence.core.SimulationContext;
+import com.emergence.swarm.AgentGroup;
+import com.emergence.swarm.GroupManager;
 import com.emergence.world.Cell;
 import com.emergence.world.Position;
 import com.emergence.world.Terrain;
@@ -30,6 +32,7 @@ public final class WorldRenderer {
 
     private boolean showTerrain = true;
     private boolean showResources = true;
+    private boolean showGroups = true;
     private boolean showAgents = true;
 
     public void adjustZoom(double factor, double pivotX, double pivotY) {
@@ -53,6 +56,7 @@ public final class WorldRenderer {
 
     public void setShowTerrain(boolean showTerrain) { this.showTerrain = showTerrain; }
     public void setShowResources(boolean showResources) { this.showResources = showResources; }
+    public void setShowGroups(boolean showGroups) { this.showGroups = showGroups; }
     public void setShowAgents(boolean showAgents) { this.showAgents = showAgents; }
 
     public Position screenToGrid(double screenX, double screenY, Canvas canvas, World world) {
@@ -68,7 +72,7 @@ public final class WorldRenderer {
         return null;
     }
 
-    public void render(Canvas canvas, SimulationContext context, Long selectedAgentId) {
+    public void render(Canvas canvas, SimulationContext context, GroupManager groupManager, Long selectedAgentId) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         double w = canvas.getWidth();
         double h = canvas.getHeight();
@@ -103,6 +107,26 @@ public final class WorldRenderer {
                     double pad = cellSize * 0.18;
                     gc.fillOval(px + pad, py + pad, Math.max(1.5, cellSize - 2 * pad), Math.max(1.5, cellSize - 2 * pad));
                 }
+            }
+        }
+
+        if (showGroups && groupManager != null) {
+            for (AgentGroup group : groupManager.getGroups()) {
+                Color groupColor = Color.hsb((group.getId() * 67.0) % 360.0, 0.75, 0.92, 0.45);
+                double cx = (group.getCentroid().x() + 0.5) * cellSize;
+                double cy = (group.getCentroid().y() + 0.5) * cellSize;
+                gc.setStroke(groupColor);
+                gc.setLineWidth(Math.max(0.8, cellSize * 0.12));
+                for (Agent agent : context.getAgents()) {
+                    if (agent.isAlive() && agent.getGroupId() == group.getId()) {
+                        double ax = (agent.getPosition().x() + 0.5) * cellSize;
+                        double ay = (agent.getPosition().y() + 0.5) * cellSize;
+                        gc.strokeLine(ax, ay, cx, cy);
+                    }
+                }
+                gc.setFill(groupColor);
+                double r = Math.max(2.0, cellSize * 0.35);
+                gc.fillOval(cx - r, cy - r, r * 2, r * 2);
             }
         }
 

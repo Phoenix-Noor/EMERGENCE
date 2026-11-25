@@ -6,6 +6,8 @@ import com.emergence.agent.Perception;
 import com.emergence.decision.Action;
 import com.emergence.decision.AgentStrategy;
 import com.emergence.game.GameTheoryEngine;
+import com.emergence.swarm.GroupManager;
+import com.emergence.swarm.NavigationEngine;
 import com.emergence.world.Cell;
 import com.emergence.world.Position;
 import com.emergence.world.Terrain;
@@ -31,6 +33,8 @@ public final class Simulation {
     private final SimulationConfig config;
     private final AgentStrategy defaultStrategy;
     private final GameTheoryEngine gameTheoryEngine;
+    private final GroupManager groupManager;
+    private final NavigationEngine navigationEngine;
     private final List<SimulationModule> modules = new ArrayList<>();
 
     private SimulationContext context;
@@ -40,13 +44,25 @@ public final class Simulation {
         this.config = Objects.requireNonNull(config, "config must not be null");
         this.defaultStrategy = Objects.requireNonNull(defaultStrategy, "defaultStrategy must not be null");
         this.gameTheoryEngine = new GameTheoryEngine();
+        this.groupManager = new GroupManager();
+        this.navigationEngine = new NavigationEngine();
         this.modules.add(this.gameTheoryEngine);
+        this.modules.add(this.groupManager);
+        this.modules.add(this.navigationEngine);
         this.config.validate();
         initializeWorld();
     }
 
     public GameTheoryEngine getGameTheoryEngine() {
         return gameTheoryEngine;
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
+    }
+
+    public NavigationEngine getNavigationEngine() {
+        return navigationEngine;
     }
 
     public void registerModule(SimulationModule module) {
