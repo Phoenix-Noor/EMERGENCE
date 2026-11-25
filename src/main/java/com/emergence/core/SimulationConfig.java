@@ -6,6 +6,13 @@ package com.emergence.core;
  */
 public final class SimulationConfig {
 
+    // Evolution parameters
+    private boolean evolutionEnabled = true;
+    private double mutationRate = 0.25; // probability per trait
+    private double mutationStrength = 0.10; // max delta magnitude
+    private boolean strategyInheritanceEnabled = true;
+
+
     private int worldWidth = 100;
     private int worldHeight = 100;
     private int initialPopulation = 100;
@@ -189,4 +196,15 @@ public final class SimulationConfig {
 
     public double getCohesionWeight() { return cohesionWeight; }
     public void setCohesionWeight(double cohesionWeight) { this.cohesionWeight = cohesionWeight; }
+
+    // Evolution getters/setters
+    public boolean isEvolutionEnabled() { return evolutionEnabled; }
+    public void setEvolutionEnabled(boolean evolutionEnabled) { this.evolutionEnabled = evolutionEnabled; }
+    public double getMutationRate() { return mutationRate; }
+    public void setMutationRate(double mutationRate) { this.mutationRate = mutationRate; }
+    public double getMutationStrength() { return mutationStrength; }
+    public void setMutationStrength(double mutationStrength) { this.mutationStrength = mutationStrength; }
+    public boolean isStrategyInheritanceEnabled() { return strategyInheritanceEnabled; }
+    public void setStrategyInheritanceEnabled(boolean strategyInheritanceEnabled) { this.strategyInheritanceEnabled = strategyInheritanceEnabled; }
+
 }

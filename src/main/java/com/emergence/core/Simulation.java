@@ -11,6 +11,7 @@ import com.emergence.social.SocialLearningEngine;
 import com.emergence.social.SocialNetwork;
 import com.emergence.swarm.GroupManager;
 import com.emergence.swarm.NavigationEngine;
+import com.emergence.ecosystem.EvolutionEngine;
 import com.emergence.world.Cell;
 import com.emergence.world.Position;
 import com.emergence.world.Terrain;
@@ -42,6 +43,7 @@ public final class Simulation {
     private final InformationDiffusion informationDiffusion;
     private final SocialLearningEngine socialLearningEngine;
     private final List<SimulationModule> modules = new ArrayList<>();
+    private final EvolutionEngine evolutionEngine = new EvolutionEngine();
 
     private SimulationContext context;
     private SimulationState state = SimulationState.IDLE;
@@ -62,6 +64,7 @@ public final class Simulation {
         this.modules.add(this.socialNetwork);
         this.modules.add(this.informationDiffusion);
         this.modules.add(this.socialLearningEngine);
+        this.modules.add(this.evolutionEngine);
         this.config.validate();
         initializeWorld();
     }
@@ -88,6 +91,10 @@ public final class Simulation {
 
     public SocialLearningEngine getSocialLearningEngine() {
         return socialLearningEngine;
+    }
+
+    public EvolutionEngine getEvolutionEngine() {
+        return evolutionEngine;
     }
 
     public void registerModule(SimulationModule module) {

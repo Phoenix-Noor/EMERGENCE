@@ -23,7 +23,15 @@ public final class Agent {
     private double energy;
     private double health;
     private int age;
+    private long parentId = 0L;
+    private int offspringCount = 0;
     private int reproductionCooldown;
+
+    public long getParentId() { return parentId; }
+    public void setParentId(long parentId) { this.parentId = parentId; }
+
+    public int getOffspringCount() { return offspringCount; }
+    public void incrementOffspringCount() { this.offspringCount++; }
     private AgentState state;
     private String lastActionName = "NONE";
     private StrategyType strategyType = StrategyType.TIT_FOR_TAT;

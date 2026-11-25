@@ -6,6 +6,7 @@ import com.emergence.core.SimulationConfig;
 import com.emergence.core.SimulationContext;
 import com.emergence.core.SimulationEvent;
 import com.emergence.world.Position;
+import com.emergence.ecosystem.ReproductionEngine;
 
 import java.util.Objects;
 
@@ -14,10 +15,8 @@ import java.util.Objects;
  */
 public final class ReproduceAction implements Action {
 
-    private static final double MUTATION_RATE = 0.25;
-    private static final double MUTATION_STRENGTH = 0.10;
-
     private final Agent parent;
+    private final ReproductionEngine reproductionEngine = new ReproductionEngine();
 
     public ReproduceAction(Agent parent) {
         this.parent = Objects.requireNonNull(parent, "parent must not be null");
@@ -44,11 +43,16 @@ public final class ReproduceAction implements Action {
     @Override
     public void execute(SimulationContext context) {
         SimulationConfig cfg = context.getConfig();
+        // Apply energy cost and cooldown
         parent.adjustEnergy(-cfg.getReproductionEnergyCost());
         parent.setReproductionCooldown(cfg.getReproductionCooldownTicks());
 
         Position spawnPos = findSpawnPosition(context);
-        AgentTraits childTraits = parent.getTraits().mutate(context.getRandom(), MUTATION_RATE, MUTATION_STRENGTH);
+
+        // Inherit traits using config‑controlled mutation
+        AgentTraits childTraits = reproductionEngine.inheritTraits(parent, cfg, context.getRandom());
+
+        // Queue offspring (generation = parent+1)
         Agent child = context.queueOffspring(
                 spawnPos,
                 cfg.getReproductionEnergyCost() * 0.9,
@@ -56,6 +60,13 @@ public final class ReproduceAction implements Action {
                 childTraits
         );
         if (child != null) {
+            // Record lineage
+            child.setParentId(parent.getId());
+            parent.incrementOffspringCount();
+            // Inherit or mutate strategy according to config
+            child.setStrategyType(
+                    reproductionEngine.inheritStrategy(parent, childTraits, cfg, context.getRandom())
+            );
             context.getEventBus().publish(new SimulationEvent(
                     context.getClock().getCurrentTick(),
                     "BIRTH",

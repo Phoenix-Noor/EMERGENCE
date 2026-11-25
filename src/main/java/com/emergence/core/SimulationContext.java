@@ -102,7 +102,7 @@ public final class SimulationContext {
                 generation,
                 traits
         );
-        offspring.setStrategyType(GameStrategies.assignFromTraits(traits, random));
+        // parentId set by ReproduceAction
         pendingOffspring.add(offspring);
         totalBirths++;
         return offspring;
